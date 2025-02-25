@@ -365,7 +365,7 @@ function resolveDocblockTypes($method, $typeNode, $depth = 1)
 
         echo $e->getMessage();
         echo PHP_EOL;
-        echo 'You can safely ignore this message if there is a native type declartion in place, which will be used as a fallback.';
+        echo 'You can safely ignore this message if there is a native type declaration in place, which will be used as a fallback.';
         echo PHP_EOL;
         echo "You may tweak the {$e->method} function of the facade-documenter if a fix is required.";
         echo PHP_EOL;
@@ -559,20 +559,20 @@ function resolveDocTags($docblock, $tag)
  * Recursively resolve docblock mixins.
  *
  * @param  \ReflectionClass  $class
- * @param  \Illuminate\Support\Collection<class-string>  $encoutered
+ * @param  \Illuminate\Support\Collection<class-string>  $encountered
  * @return \Illuminate\Support\Collection<\ReflectionClass>
  */
-function resolveDocMixins($class, $encoutered = new Collection)
+function resolveDocMixins($class, $encountered = new Collection)
 {
-    if ($encoutered->contains($class->getName())) {
+    if ($encountered->contains($class->getName())) {
         return collect();
     }
 
-    $encoutered[] = $class->getName();
+    $encountered[] = $class->getName();
 
     return resolveDocTags($class->getDocComment() ?: '', '@mixin ')
         ->map(fn ($mixin) => new ReflectionClass($mixin))
-        ->flatMap(fn ($mixin) => [$mixin, ...resolveDocMixins($mixin, $encoutered)]);
+        ->flatMap(fn ($mixin) => [$mixin, ...resolveDocMixins($mixin, $encountered)]);
 }
 
 /**
