@@ -85,7 +85,7 @@ collect($argv)
 
         // Fix: ensure we keep the references to the Carbon library on the Date Facade...
 
-        if ($facade->getName() === Illuminate\Support\Facades\Date::class) {
+        if ($facade->getName() === LaravelHyperf\Support\Facades\Date::class) {
             $methods->prepend(' *')
                 ->prepend(' * @see https://github.com/briannesbitt/Carbon/blob/master/src/Carbon/Factory.php')
                 ->prepend(' * @see https://carbon.nesbot.com/docs/');
@@ -419,7 +419,7 @@ function handleConditionalType($method, $typeNode)
 {
     if (
         in_array($method->getname(), ['pull', 'get']) &&
-        $method->getDeclaringClass()->getName() === Illuminate\Cache\Repository::class
+        $method->getDeclaringClass()->getName() === LaravelHyperf\Cache\Contracts\Repository::class
     ) {
         return 'mixed';
     }
@@ -451,42 +451,42 @@ function handleUnknownIdentifierType($method, $typeNode)
 
     if (
         $typeNode->name === 'TCacheValue' &&
-        $method->getDeclaringClass()->getName() === Illuminate\Cache\Repository::class
+        $method->getDeclaringClass()->getName() === LaravelHyperf\Cache\Contracts\Repository::class
     ) {
         return 'mixed';
     }
 
     if (
         $typeNode->name === 'TWhenParameter' &&
-        in_array(Illuminate\Support\Traits\Conditionable::class, class_uses_recursive($method->getDeclaringClass()->getName()))
+        in_array(Hyperf\Conditionable\Conditionable::class, class_uses_recursive($method->getDeclaringClass()->getName()))
     ) {
         return 'mixed';
     }
 
     if (
         $typeNode->name === 'TWhenReturnType' &&
-        in_array(Illuminate\Support\Traits\Conditionable::class, class_uses_recursive($method->getDeclaringClass()->getName()))
+        in_array(Hyperf\Conditionable\Conditionable::class, class_uses_recursive($method->getDeclaringClass()->getName()))
     ) {
         return 'mixed';
     }
 
     if (
         $typeNode->name === 'TUnlessParameter' &&
-        in_array(Illuminate\Support\Traits\Conditionable::class, class_uses_recursive($method->getDeclaringClass()->getName()))
+        in_array(Hyperf\Conditionable\Conditionable::class, class_uses_recursive($method->getDeclaringClass()->getName()))
     ) {
         return 'mixed';
     }
 
     if (
         $typeNode->name === 'TUnlessReturnType' &&
-        in_array(Illuminate\Support\Traits\Conditionable::class, class_uses_recursive($method->getDeclaringClass()->getName()))
+        in_array(Hyperf\Conditionable\Conditionable::class, class_uses_recursive($method->getDeclaringClass()->getName()))
     ) {
         return 'mixed';
     }
 
     if (
         $typeNode->name === 'TEnum' &&
-        $method->getDeclaringClass()->getName() === Illuminate\Http\Request::class
+        $method->getDeclaringClass()->getName() === LaravelHyperf\Http\Request::class
     ) {
         return 'object';
     }

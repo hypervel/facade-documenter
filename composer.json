@@ -1,5 +1,5 @@
 {
-    "name": "laravel/facade-documenter",
+    "name": "laravel-hyperf/facade-documenter",
     "type": "library",
     "license": "MIT",
     "bin": "facade.php",

@@ -2,22 +2,22 @@
 
 ```sh
 # Configure composer
-composer config repositories.facade-documenter vcs git@github.com:laravel/facade-documenter.git
+composer config repositories.facade-documenter vcs git@github.com:laravel-hyperf/facade-documenter.git
 
 # Install the package
-composer require --dev laravel/facade-documenter:dev-main
+composer require --dev laravel-hyperf/facade-documenter:dev-main
 
 # Update the docblocks:
 php -f vendor/bin/facade.php -- \
-    Illuminate\\Support\\Facades\\App \
-    Illuminate\\Support\\Facades\\Artisan \
-    Illuminate\\Support\\Facades\\Auth \
+    LaravelHyperf\\Support\\Facades\\App \
+    LaravelHyperf\\Support\\Facades\\Artisan \
+    LaravelHyperf\\Support\\Facades\\Auth \
     ...
 
 # Lint the docblocks:
 php -f vendor/bin/facade.php -- --lint \
-    Illuminate\\Support\\Facades\\App \
-    Illuminate\\Support\\Facades\\Artisan \
-    Illuminate\\Support\\Facades\\Auth \
+    LaravelHyperf\\Support\\Facades\\App \
+    LaravelHyperf\\Support\\Facades\\Artisan \
+    LaravelHyperf\\Support\\Facades\\Auth \
     ...
 ```
