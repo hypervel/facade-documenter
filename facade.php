@@ -31,12 +31,17 @@ use PHPStan\PhpDocParser\Parser\TokenIterator;
 use PHPStan\PhpDocParser\Parser\TypeParser;
 
 $linting = in_array('--lint', $argv);
+$verbose = in_array('--verbose', $argv);
+
+set_exception_handler('exceptionHandler');
 
 collect($argv)
     ->skip(1)
     ->filter(fn ($arg) => ! str_starts_with($arg, '-'))
     ->map(fn ($class) => new ReflectionClass($class))
     ->each(function ($facade) use ($linting) {
+        debug("Processing [{$facade->getName()}]...");
+
         $proxies = resolveDocSees($facade);
 
         if ($proxies->isEmpty()) {
@@ -47,7 +52,9 @@ collect($argv)
 
         // Build a list of methods that are available on the Facade...
 
-        $resolvedMethods = $proxies->map(fn ($fqcn) => new ReflectionClass($fqcn))
+        $resolvedMethods = $proxies
+            ->each(fn ($fqcn) => debug("  - {$fqcn}"))
+            ->map(fn ($fqcn) => new ReflectionClass($fqcn))
             ->flatMap(fn ($class) => [$class, ...resolveDocMixins($class)])
             ->flatMap(resolveMethods(...))
             ->reject(isMagic(...))
@@ -121,8 +128,34 @@ collect($argv)
         file_put_contents($facade->getFileName(), $contents);
     });
 
-echo 'Done.';
+echo 'Done.'.PHP_EOL;
 exit(0);
+
+/**
+ * Handle the uncaught exceptions.
+ *
+ * @param  Throwable  $exception
+ * @return void
+ */
+function exceptionHandler(Throwable $exception) {
+    echo (string) $exception.PHP_EOL;
+    exit(1);
+}
+
+/**
+ * Log the given message.
+ *
+ * @param  string  $message
+ * @return void
+ */
+function debug($message)
+{
+    global $verbose;
+
+    if ($verbose) {
+        echo $message.PHP_EOL;
+    }
+}
 
 /**
  * Resolve the classes referenced in the @see docblocks.
@@ -568,9 +601,12 @@ function resolveDocMixins($class, $encountered = new Collection)
         return collect();
     }
 
+    debug("Resolving mixins for [{$class->getName()}]...");
+
     $encountered[] = $class->getName();
 
     return resolveDocTags($class->getDocComment() ?: '', '@mixin ')
+        ->each(fn ($mixin) => debug("  - {$mixin}"))
         ->map(fn ($mixin) => new ReflectionClass($mixin))
         ->flatMap(fn ($mixin) => [$mixin, ...resolveDocMixins($mixin, $encountered)]);
 }
