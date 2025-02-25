@@ -69,6 +69,10 @@ collect($argv)
 
         $methods = $resolvedMethods->map(function ($method) {
             if (is_string($method)) {
+                if (Str::startsWith($method, 'static')) {
+                    return " * @method {$method}";
+                }
+
                 return " * @method static {$method}";
             }
 
