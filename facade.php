@@ -35,7 +35,7 @@ $verbose = in_array('--verbose', $argv);
 
 set_exception_handler('exceptionHandler');
 
-collect($argv)
+(new Collection($argv))
     ->skip(1)
     ->filter(fn ($arg) => ! str_starts_with($arg, '-'))
     ->map(fn ($class) => new ReflectionClass($class))
@@ -195,7 +195,7 @@ function resolveDocMethods($class)
  */
 function resolveDocParamType($method, $parameter)
 {
-    $paramTypeNode = collect(parseDocblock($method->getDocComment())->getParamTagValues())
+    $paramTypeNode = (new Collection(parseDocblock($method->getDocComment())->getParamTagValues()))
         ->firstWhere('parameterName', '$'.$parameter->getName());
 
     // As we didn't find a param type, we will now recursively check if the prototype has a value specified...
@@ -258,14 +258,14 @@ function resolveDocblockTypes($method, $typeNode, $depth = 1)
 {
     try {
         if ($typeNode instanceof UnionTypeNode) {
-            return '('.collect($typeNode->types)
+            return '('.(new Collection($typeNode->types))
                 ->map(fn ($node) => resolveDocblockTypes($method, $node, $depth + 1))
                 ->unique()
                 ->implode('|').')';
         }
 
         if ($typeNode instanceof IntersectionTypeNode) {
-            return '('.collect($typeNode->types)
+            return '('.(new Collection($typeNode->types))
                 ->map(fn ($node) => resolveDocblockTypes($method, $node, $depth + 1))
                 ->unique()
                 ->implode('&').')';
@@ -443,7 +443,7 @@ function handleConditionalType($method, $typeNode)
 function handleUnknownIdentifierType($method, $typeNode)
 {
     $docblock = parseDocblock($method->getDocComment());
-    $boundTemplateType = collect($docblock->getTemplateTagValues())->firstWhere('name', $typeNode->name)?->bound;
+    $boundTemplateType = (new Collection($docblock->getTemplateTagValues()))->firstWhere('name', $typeNode->name)?->bound;
 
     if ($boundTemplateType !== null) {
         $resolvedTemplateType = resolveDocblockTypes($method, $boundTemplateType);
@@ -539,14 +539,14 @@ function isKnownOptionalDependency($type)
 function resolveType($method, $type)
 {
     if ($type instanceof ReflectionIntersectionType) {
-        return collect($type->getTypes())
+        return (new Collection($type->getTypes()))
             ->map(fn ($type) => resolveType($method, $type))
             ->filter()
             ->join('&');
     }
 
     if ($type instanceof ReflectionUnionType) {
-        return collect($type->getTypes())
+        return (new Collection($type->getTypes()))
             ->map(fn ($type) => resolveType($method, $type))
             ->filter()
             ->join('|');
@@ -602,7 +602,7 @@ function resolveDocTags($docblock, $tag)
 function resolveDocMixins($class, $encountered = new Collection)
 {
     if ($encountered->contains($class->getName())) {
-        return collect();
+        return new Collection();
     }
 
     debug("Resolving mixins for [{$class->getName()}]...");
@@ -712,7 +712,7 @@ function resolveName($method)
  */
 function resolveMethods($class)
 {
-    return collect($class->getMethods(ReflectionMethod::IS_PUBLIC))
+    return (new Collection($class->getMethods(ReflectionMethod::IS_PUBLIC)))
         ->map(fn ($method) => new ReflectionMethodDecorator($method, $class->getName()))
         ->merge(resolveDocMethods($class));
 }
@@ -726,7 +726,7 @@ function resolveMethods($class)
  */
 function conflictsWithFacade($facade, $method)
 {
-    return collect($facade->getMethods(ReflectionMethod::IS_PUBLIC | ReflectionMethod::IS_STATIC))
+    return (new Collection($facade->getMethods(ReflectionMethod::IS_PUBLIC | ReflectionMethod::IS_STATIC)))
         ->map(fn ($method) => $method->getName())
         ->contains(is_string($method) ? $method : $method->getName());
 }
@@ -767,7 +767,7 @@ function resolveParameters($method)
         ->skip($method->getNumberOfParameters())
         ->mapInto(DynamicParameter::class);
 
-    return collect($method->getParameters())->merge($dynamicParameters);
+    return (new Collection($method->getParameters()))->merge($dynamicParameters);
 }
 
 /**
