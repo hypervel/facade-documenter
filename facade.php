@@ -650,6 +650,10 @@ function isInternal($method)
         return false;
     }
 
+    if (Str::startsWith($method->getName(), '_')) {
+        return true;
+    }
+
     return resolveDocTags($method->getDocComment(), '@internal')->isNotEmpty();
 }
 
