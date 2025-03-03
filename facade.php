@@ -308,9 +308,9 @@ function resolveDocblockTypes($method, $typeNode, $depth = 1)
                 return 'int';
             }
 
-            $guessedFqcn = resolveClassImports($method->getDeclaringClass())->get($typeNode->name) ?? '\\'.$method->getDeclaringClass()->getNamespaceName().'\\'.$typeNode->name;
+            $guessedFqcn = resolveClassImports($method)->get($typeNode->name) ?? '\\'.$method->getDeclaringClass()->getNamespaceName().'\\'.$typeNode->name;
 
-            foreach ([$typeNode->name, $guessedFqcn] as $name) {
+            foreach ([$guessedFqcn, $typeNode->name] as $name) {
                 if (class_exists($name)) {
                     return Str::start((string) $name, '\\');
                 }
@@ -773,12 +773,16 @@ function resolveParameters($method)
 /**
  * Resolve the classes imports.
  *
- * @param  \ReflectionClass  $class
+ * @param  \ReflectionMethod  $method
  * @return \LaravelHyperf\Support\Collection<string, class-string>
  */
-function resolveClassImports($class)
+function resolveClassImports($method)
 {
-    return Str::of(file_get_contents($class->getFileName()))
+    $filename = $method->getFileName();
+    $class = (new Collection($method->getDeclaringClass()->getTraits()))->first(fn ($trait) => $trait->getFileName() === $filename)
+        ?? $method->getDeclaringClass();
+
+    return Str::of(file_get_contents($filename))
         ->explode(PHP_EOL)
         ->take($class->getStartLine() - 1)
         ->filter(fn ($line) => preg_match('/^use [A-Za-z0-9\\\\]+( as [A-Za-z0-9]+)?;$/', $line) === 1)
