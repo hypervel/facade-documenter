@@ -2,8 +2,8 @@
 
 require_once $_composer_autoload_path ?? __DIR__.'/../vendor/autoload.php';
 
-use Illuminate\Support\Collection;
-use Illuminate\Support\Str;
+use LaravelHyperf\Support\Collection;
+use LaravelHyperf\Support\Str;
 use PHPStan\PhpDocParser\Ast\ConstExpr\ConstExprArrayNode;
 use PHPStan\PhpDocParser\Ast\ConstExpr\ConstExprFalseNode;
 use PHPStan\PhpDocParser\Ast\ConstExpr\ConstExprFloatNode;
@@ -165,7 +165,7 @@ function debug($message)
  * Resolve the classes referenced in the @see docblocks.
  *
  * @param  \ReflectionClass  $class
- * @return \Illuminate\Support\Collection<class-string>
+ * @return \LaravelHyperf\Support\Collection<class-string>
  */
 function resolveDocSees($class)
 {
@@ -177,7 +177,7 @@ function resolveDocSees($class)
  * Resolve the classes referenced methods in the @methods docblocks.
  *
  * @param  \ReflectionClass  $class
- * @return \Illuminate\Support\Collection<string>
+ * @return \LaravelHyperf\Support\Collection<string>
  */
 function resolveDocMethods($class)
 {
@@ -576,7 +576,7 @@ function resolveType($method, $type)
  *
  * @param  string  $docblock
  * @param  string  $tag
- * @return \Illuminate\Support\Collection<string>
+ * @return \LaravelHyperf\Support\Collection<string>
  */
 function resolveDocTags($docblock, $tag)
 {
@@ -596,8 +596,8 @@ function resolveDocTags($docblock, $tag)
  * Recursively resolve docblock mixins.
  *
  * @param  \ReflectionClass  $class
- * @param  \Illuminate\Support\Collection<class-string>  $encountered
- * @return \Illuminate\Support\Collection<\ReflectionClass>
+ * @param  \LaravelHyperf\Support\Collection<class-string>  $encountered
+ * @return \LaravelHyperf\Support\Collection<\ReflectionClass>
  */
 function resolveDocMixins($class, $encountered = new Collection)
 {
@@ -619,7 +619,7 @@ function resolveDocMixins($class, $encountered = new Collection)
  * Resolve the classes referenced methods in the @methods docblocks.
  *
  * @param  \ReflectionMethodDecorator  $method
- * @return \Illuminate\Support\Collection<int, string>
+ * @return \LaravelHyperf\Support\Collection<int, string>
  */
 function resolveDocParameters($method)
 {
@@ -708,7 +708,7 @@ function resolveName($method)
  * Resolve the classes methods.
  *
  * @param  \ReflectionClass  $class
- * @return \Illuminate\Support\Collection<\ReflectionMethodDecorator|string>
+ * @return \LaravelHyperf\Support\Collection<\ReflectionMethodDecorator|string>
  */
 function resolveMethods($class)
 {
@@ -759,7 +759,7 @@ function normaliseDetails($method)
  * Resolve the parameters for the method.
  *
  * @param  \ReflectionMethodDecorator  $method
- * @return \Illuminate\Support\Collection<int, \ReflectionParameter|\DynamicParameter>
+ * @return \LaravelHyperf\Support\Collection<int, \ReflectionParameter|\DynamicParameter>
  */
 function resolveParameters($method)
 {
@@ -774,7 +774,7 @@ function resolveParameters($method)
  * Resolve the classes imports.
  *
  * @param  \ReflectionClass  $class
- * @return \Illuminate\Support\Collection<string, class-string>
+ * @return \LaravelHyperf\Support\Collection<string, class-string>
  */
 function resolveClassImports($class)
 {
@@ -797,8 +797,8 @@ function resolveClassImports($class)
 function resolveDefaultValue($parameter)
 {
     // Reflection limitation fix for:
-    // - Illuminate\Filesystem\Filesystem::ensureDirectoryExists()
-    // - Illuminate\Filesystem\Filesystem::makeDirectory()
+    // - LaravelHyperf\Filesystem\Filesystem::ensureDirectoryExists()
+    // - LaravelHyperf\Filesystem\Filesystem::makeDirectory()
     if ($parameter['name'] === '$mode' && $parameter['default'] === 493) {
         return '0755';
     }
