@@ -1,12 +1,12 @@
 {
-    "name": "laravel-hyperf/facade-documenter",
+    "name": "hypervel/facade-documenter",
     "type": "library",
     "license": "MIT",
     "bin": "facade.php",
     "require": {
         "composer-runtime-api": "^2.2",
         "phpstan/phpdoc-parser": "^1.16",
-        "laravel-hyperf/support": "*"
+        "hypervel/support": "*"
     },
     "composer-runtime-api": "^2.2"
 }

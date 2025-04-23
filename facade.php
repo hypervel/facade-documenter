@@ -2,8 +2,8 @@
 
 require_once $_composer_autoload_path ?? __DIR__.'/../vendor/autoload.php';
 
-use LaravelHyperf\Support\Collection;
-use LaravelHyperf\Support\Str;
+use Hypervel\Support\Collection;
+use Hypervel\Support\Str;
 use PHPStan\PhpDocParser\Ast\ConstExpr\ConstExprArrayNode;
 use PHPStan\PhpDocParser\Ast\ConstExpr\ConstExprFalseNode;
 use PHPStan\PhpDocParser\Ast\ConstExpr\ConstExprFloatNode;
@@ -89,7 +89,7 @@ set_exception_handler('exceptionHandler');
 
         // Fix: ensure we keep the references to the Carbon library on the Date Facade...
 
-        if ($facade->getName() === LaravelHyperf\Support\Facades\Date::class) {
+        if ($facade->getName() === Hypervel\Support\Facades\Date::class) {
             $methods->prepend(' *')
                 ->prepend(' * @see https://github.com/briannesbitt/Carbon/blob/master/src/Carbon/Factory.php')
                 ->prepend(' * @see https://carbon.nesbot.com/docs/');
@@ -165,7 +165,7 @@ function debug($message)
  * Resolve the classes referenced in the @see docblocks.
  *
  * @param  \ReflectionClass  $class
- * @return \LaravelHyperf\Support\Collection<class-string>
+ * @return \Hypervel\Support\Collection<class-string>
  */
 function resolveDocSees($class)
 {
@@ -177,7 +177,7 @@ function resolveDocSees($class)
  * Resolve the classes referenced methods in the @methods docblocks.
  *
  * @param  \ReflectionClass  $class
- * @return \LaravelHyperf\Support\Collection<string>
+ * @return \Hypervel\Support\Collection<string>
  */
 function resolveDocMethods($class)
 {
@@ -423,7 +423,7 @@ function handleConditionalType($method, $typeNode)
 {
     if (
         in_array($method->getname(), ['pull', 'get']) &&
-        $method->getDeclaringClass()->getName() === LaravelHyperf\Cache\Contracts\Repository::class
+        $method->getDeclaringClass()->getName() === Hypervel\Cache\Contracts\Repository::class
     ) {
         return 'mixed';
     }
@@ -455,7 +455,7 @@ function handleUnknownIdentifierType($method, $typeNode)
 
     if (
         $typeNode->name === 'TCacheValue' &&
-        $method->getDeclaringClass()->getName() === LaravelHyperf\Cache\Contracts\Repository::class
+        $method->getDeclaringClass()->getName() === Hypervel\Cache\Contracts\Repository::class
     ) {
         return 'mixed';
     }
@@ -490,7 +490,7 @@ function handleUnknownIdentifierType($method, $typeNode)
 
     if (
         $typeNode->name === 'TEnum' &&
-        $method->getDeclaringClass()->getName() === LaravelHyperf\Http\Request::class
+        $method->getDeclaringClass()->getName() === Hypervel\Http\Request::class
     ) {
         return 'object';
     }
@@ -576,7 +576,7 @@ function resolveType($method, $type)
  *
  * @param  string  $docblock
  * @param  string  $tag
- * @return \LaravelHyperf\Support\Collection<string>
+ * @return \Hypervel\Support\Collection<string>
  */
 function resolveDocTags($docblock, $tag)
 {
@@ -596,8 +596,8 @@ function resolveDocTags($docblock, $tag)
  * Recursively resolve docblock mixins.
  *
  * @param  \ReflectionClass  $class
- * @param  \LaravelHyperf\Support\Collection<class-string>  $encountered
- * @return \LaravelHyperf\Support\Collection<\ReflectionClass>
+ * @param  \Hypervel\Support\Collection<class-string>  $encountered
+ * @return \Hypervel\Support\Collection<\ReflectionClass>
  */
 function resolveDocMixins($class, $encountered = new Collection)
 {
@@ -619,7 +619,7 @@ function resolveDocMixins($class, $encountered = new Collection)
  * Resolve the classes referenced methods in the @methods docblocks.
  *
  * @param  \ReflectionMethodDecorator  $method
- * @return \LaravelHyperf\Support\Collection<int, string>
+ * @return \Hypervel\Support\Collection<int, string>
  */
 function resolveDocParameters($method)
 {
@@ -708,7 +708,7 @@ function resolveName($method)
  * Resolve the classes methods.
  *
  * @param  \ReflectionClass  $class
- * @return \LaravelHyperf\Support\Collection<\ReflectionMethodDecorator|string>
+ * @return \Hypervel\Support\Collection<\ReflectionMethodDecorator|string>
  */
 function resolveMethods($class)
 {
@@ -759,7 +759,7 @@ function normaliseDetails($method)
  * Resolve the parameters for the method.
  *
  * @param  \ReflectionMethodDecorator  $method
- * @return \LaravelHyperf\Support\Collection<int, \ReflectionParameter|\DynamicParameter>
+ * @return \Hypervel\Support\Collection<int, \ReflectionParameter|\DynamicParameter>
  */
 function resolveParameters($method)
 {
@@ -774,7 +774,7 @@ function resolveParameters($method)
  * Resolve the classes imports.
  *
  * @param  \ReflectionMethod  $method
- * @return \LaravelHyperf\Support\Collection<string, class-string>
+ * @return \Hypervel\Support\Collection<string, class-string>
  */
 function resolveClassImports($method)
 {
@@ -801,8 +801,8 @@ function resolveClassImports($method)
 function resolveDefaultValue($parameter)
 {
     // Reflection limitation fix for:
-    // - LaravelHyperf\Filesystem\Filesystem::ensureDirectoryExists()
-    // - LaravelHyperf\Filesystem\Filesystem::makeDirectory()
+    // - Hypervel\Filesystem\Filesystem::ensureDirectoryExists()
+    // - Hypervel\Filesystem\Filesystem::makeDirectory()
     if ($parameter['name'] === '$mode' && $parameter['default'] === 493) {
         return '0755';
     }
