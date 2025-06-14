@@ -749,7 +749,7 @@ function normaliseDetails($method)
                     ? $parameter->getDefaultValue()
                     : "❌ Unknown default for [{$parameter->getName()}] in [{$parameter->getDeclaringClass()?->getName()}::{$parameter->getDeclaringFunction()->getName()}] ❌",
                 'variadic' => $parameter->isVariadic(),
-                'type' => resolveDocParamType($method, $parameter) ?? resolveType($method, $parameter->getType()) ?? 'void',
+                'type' => resolveDocParamType($method, $parameter) ?? resolveType($method, $parameter->getType()) ?? 'mixed',
             ]),
         'returns' => resolveReturnDocType($method) ?? resolveType($method, $method->getReturnType()) ?? 'void',
     ];
