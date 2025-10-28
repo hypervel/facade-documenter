@@ -2,6 +2,7 @@
 
 require_once $_composer_autoload_path ?? __DIR__.'/../vendor/autoload.php';
 
+use Hypervel\Redis\RedisConnection;
 use Hypervel\Support\Collection;
 use Hypervel\Support\Str;
 use PHPStan\PhpDocParser\Ast\ConstExpr\ConstExprArrayNode;
@@ -12,6 +13,7 @@ use PHPStan\PhpDocParser\Ast\ConstExpr\ConstExprNullNode;
 use PHPStan\PhpDocParser\Ast\ConstExpr\ConstExprStringNode;
 use PHPStan\PhpDocParser\Ast\ConstExpr\ConstExprTrueNode;
 use PHPStan\PhpDocParser\Ast\ConstExpr\ConstFetchNode;
+use PHPStan\PhpDocParser\Ast\PhpDoc\MethodTagValueNode;
 use PHPStan\PhpDocParser\Ast\Type\ArrayShapeNode;
 use PHPStan\PhpDocParser\Ast\Type\ArrayTypeNode;
 use PHPStan\PhpDocParser\Ast\Type\CallableTypeNode;
@@ -181,9 +183,33 @@ function resolveDocSees($class)
  */
 function resolveDocMethods($class)
 {
-    return resolveDocTags($class->getDocComment() ?: '', '@method ')
-        ->map(fn ($tag) => Str::squish($tag))
-        ->map(fn ($tag) => Str::before($tag, ')').')');
+    try {
+        if ($class->getName() === RedisConnection::class) {
+            throw new RuntimeException('Skipping RedisConnection class as it has complex docblocks.');
+        }
+
+        $dummyReflectionMethod = new ReflectionMethod($class->getName(), '__construct');
+
+        return (new Collection(parseDocblock($class->getDocComment())->getTags()))
+            ->filter(fn ($tag) => $tag->value instanceof MethodTagValueNode)
+            ->map(function ($tag) use ($dummyReflectionMethod) {
+                /** @var MethodTagValueNode $method */
+                $method = $tag->value;
+
+                $method->parameters = (new Collection($method->parameters))->map(function ($parameter) use ($dummyReflectionMethod) {
+                    $parameter->type = new IdentifierTypeNode($parameter->type ? resolveDocblockTypes($dummyReflectionMethod, $parameter->type) : 'mixed');
+
+                    return $parameter;
+                })->toArray();
+                $method->returnType = $method->returnType ? new IdentifierTypeNode(resolveDocblockTypes($dummyReflectionMethod, $method->returnType)) : new IdentifierTypeNode('void');
+
+                return (string) $method;
+            });
+    } catch (Throwable) {
+        return resolveDocTags($class->getDocComment() ?: '', '@method ')
+            ->map(fn ($tag) => Str::squish($tag))
+            ->map(fn ($tag) => Str::before($tag, ')').')');
+    }
 }
 
 /**
